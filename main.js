@@ -12,9 +12,12 @@ function templateHTML(title, fileList, content) {
       </head>
       <body>
         <h1><a href="/">WEB</a></h1>
-        <ol>
+        <ul>
           ${fileList}      
-        </ol>
+        </ul>
+        <ul>
+          <li><a href="/create">create</a></li>
+        </ul>
         <h2>${title}</h2>
         <p>${content}</p>
       </body>
@@ -41,13 +44,31 @@ let app = http.createServer(function(request,response){
         content = title !== undefined ? content : 'hello, nodeJs';
         
         fs.readdir('./data/', (err, _fileList) => {
-          let fileList = getFileList(_fileList);
+          let fileList = getFileList(_fileList );
           let template = templateHTML(title, fileList, content);
 
           response.writeHead(200);
           response.end(template);
         });        
       });    
+    } else if (pathname === '/create') {
+      fs.readdir('./data/', (err, _fileList) => {
+        let fileList = getFileList(_fileList );
+        let template = templateHTML(title = 'create', fileList, `
+          <form action="http://localhost:3000/process_create" method="post">
+            <p><input type="text" name="title" placeholder="title"></p>
+            <p>
+              <textarea name="description" placeholder="description"></textarea>
+            </p>
+            <p>
+              <input type="submit">
+            </p>
+          </form>
+        `);
+
+        response.writeHead(200);
+        response.end(template);
+      });
     } else {
       response.writeHead(404);
       response.end('Not found');
